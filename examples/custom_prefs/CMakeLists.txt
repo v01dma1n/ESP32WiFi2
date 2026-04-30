@@ -5,4 +5,4 @@ cmake_minimum_required(VERSION 3.16)
 #   git submodule add https://github.com/v01dma1n/ESP32WiFi2 components/esp32_wifi
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(wifi2-demo)
+project(wifi2-custom-prefs)
