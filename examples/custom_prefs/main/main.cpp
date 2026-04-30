@@ -6,7 +6,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-static constexpr const char* HOST_NAME     = "wifi2-demo";
+static constexpr const char* HOST_NAME     = "wifi2-cust-pref";
 static constexpr int         WIFI_ATTEMPTS = 3;
 
 extern "C" void app_main() {
