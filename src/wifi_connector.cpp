@@ -21,10 +21,13 @@ static bool s_initDone = false;
 static esp_netif_t* s_staNetif = nullptr;
 
 static void onWifiEvent(void* /*arg*/, esp_event_base_t base,
-                        int32_t id, void* /*data*/) {
+                        int32_t id, void* data) {
     if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START) {
         esp_wifi_connect();
     } else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
+        auto* d = static_cast<wifi_event_sta_disconnected_t*>(data);
+        LOGINF("WiFi disconnected: reason=%d rssi=%d",
+               d ? (int)d->reason : -1, d ? (int)d->rssi : 0);
         xEventGroupSetBits(s_wifiEvents, BIT_FAILED);
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
         xEventGroupSetBits(s_wifiEvents, BIT_CONNECTED);
