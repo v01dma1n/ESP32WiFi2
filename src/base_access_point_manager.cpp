@@ -436,6 +436,12 @@ void BaseAccessPointManager::initializeFormFields() {
         { .str_pref = s_logLevelBuffer }, s_logLevelOptions,
         s_numLogLevelOptions,
     });
+
+    _formFields.push_back(FormField{
+        "wifiidle", "Disconnect WiFi between time syncs (saves power/CPU)",
+        false, VALIDATION_NONE, PREF_BOOL,
+        { .bool_pref = &cfg.wifiDisconnectIdle }, nullptr, 0,
+    });
 }
 
 // Lightweight HTML escaping for values embedded in the form.

@@ -9,9 +9,11 @@
 //   class  WhispererPreferences : public BasePreferences { ... overrides ... };
 //
 // `BaseConfig` carries *only* the credentials/settings the engine itself
-// needs: SSID, password, POSIX timezone, and log level. Everything else
-// (weather keys, display brightness, mood thresholds, ...) lives in the
-// subclass's config struct and is serialized via the subclass's overrides.
+// needs: SSID, password, POSIX timezone, log level, and the WiFi idle
+// policy (drop the association between periodic uses, or stay connected).
+// Everything else (weather keys, display brightness, mood thresholds, ...)
+// lives in the subclass's config struct and is serialized via the
+// subclass's overrides.
 
 #pragma once
 
@@ -31,6 +33,13 @@ struct BaseConfig {
     char password[MAX_PREF_STRING_LEN];
     char time_zone[MAX_PREF_STRING_LEN];   // POSIX TZ, e.g. "EST5EDT,M3.2.0..."
     AppLogLevel logLevel;
+    // True (default): drop the WiFi association whenever the app has no
+    // immediate use for it — e.g. between hourly NTP resyncs — instead of
+    // staying connected around the clock. Staying associated costs real
+    // CPU/radio time even when idle (802.11 block-ack housekeeping with the
+    // router alone showed up as ~50% CPU on an ESP32 clock). Set false for
+    // devices that genuinely need continuous connectivity.
+    bool wifiDisconnectIdle;
 };
 
 class BasePreferences {

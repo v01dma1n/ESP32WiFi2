@@ -40,8 +40,10 @@ include paths.
 - `initializeFormFields()` must call `BaseAccessPointManager::initializeFormFields()`
   first so WiFi/TZ/logLevel fields are always at the top of the portal form.
 
-- `BaseConfig` carries only SSID, password, POSIX timezone, and log level.
-  Everything else goes in the app's derived struct.
+- `BaseConfig` carries only SSID, password, POSIX timezone, log level, and
+  `wifiDisconnectIdle` (default true: drop the association between periodic
+  uses rather than staying connected — an idle association costs real
+  CPU/radio time). Everything else goes in the app's derived struct.
 
 - `runBlockingLoop()` deliberately has no display dependency. If the app
   wants to push banners to a display while waiting, do it in the concrete

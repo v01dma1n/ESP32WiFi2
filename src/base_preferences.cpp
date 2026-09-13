@@ -14,6 +14,7 @@ static constexpr const char* KEY_SSID      = "ssid";
 static constexpr const char* KEY_PASSWORD  = "password";
 static constexpr const char* KEY_TIMEZONE  = "timezone";
 static constexpr const char* KEY_LOG_LEVEL = "loglevel";
+static constexpr const char* KEY_WIFI_IDLE = "wifiidle";
 
 BasePreferences::BasePreferences(BaseConfig& config)
     : _config(config), _nvs_handle(0), _nvs_open(false), _initialized(false) {}
@@ -40,6 +41,7 @@ void BasePreferences::setup() {
     // in the captive portal (as opposed to random stack garbage).
     std::memset(&_config, 0, sizeof(_config));
     _config.logLevel = APP_LOG_INFO;
+    _config.wifiDisconnectIdle = true;   // power-saving default; portal can clear it
 
     _initialized = true;
 }
@@ -134,6 +136,9 @@ void BasePreferences::getPreferences() {
     if (lvl < APP_LOG_ERROR || lvl > APP_LOG_DEBUG) lvl = APP_LOG_INFO;
     _config.logLevel = static_cast<AppLogLevel>(lvl);
 
+    // Missing key (device provisioned before this field existed) -> default on.
+    _config.wifiDisconnectIdle = readBool(KEY_WIFI_IDLE, true);
+
     closeNvs();
 }
 
@@ -145,6 +150,7 @@ void BasePreferences::putPreferences() {
     writeString(KEY_PASSWORD, _config.password);
     writeString(KEY_TIMEZONE, _config.time_zone);
     writeInt   (KEY_LOG_LEVEL, static_cast<int32_t>(_config.logLevel));
+    writeBool  (KEY_WIFI_IDLE, _config.wifiDisconnectIdle);
 
     // Commit to flash. Without this, a reset could lose the writes.
     nvs_commit(static_cast<nvs_handle_t>(_nvs_handle));
@@ -157,4 +163,5 @@ void BasePreferences::dumpPreferences() {
     LOGDBG("Pref=%s: %s", KEY_PASSWORD, "***");          // never log the pw
     LOGDBG("Pref=%s: %s", KEY_TIMEZONE, _config.time_zone);
     LOGDBG("Pref=%s: %d", KEY_LOG_LEVEL, static_cast<int>(_config.logLevel));
+    LOGDBG("Pref=%s: %d", KEY_WIFI_IDLE, _config.wifiDisconnectIdle ? 1 : 0);
 }
