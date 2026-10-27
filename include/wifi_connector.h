@@ -10,7 +10,7 @@
 void WiFiInit();
 
 // Attempt to connect in STA mode. `host` is the hostname advertised via
-// DHCP option 12. Each attempt waits up to ~10s for an IP. Returns true
+// DHCP option 12 and as <host>.local over mDNS. Each attempt waits up to ~10s for an IP. Returns true
 // on success, false otherwise (caller drops into AP mode).
 bool WiFiConnect(const char* host, const char* ssid, const char* pass,
                  int attempts);

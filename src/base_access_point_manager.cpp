@@ -495,8 +495,19 @@ void BaseAccessPointManager::generateForm(std::string& out) {
         "</style></head><body><main>"
         "<h1>";
     htmlEscape(out, _pageTitle.c_str());
-    out += "</h1><p class=sub>setup mode &middot; fill in and save</p>"
-           "<form method=POST action='/save'>";
+    // Station MAC: the address the router lists and DHCP reservations key on.
+    uint8_t mac[6] = {};
+    char macStr[18] = {};
+    if (esp_read_mac(mac, ESP_MAC_WIFI_STA) == ESP_OK) {
+        std::snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
+                      mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    }
+    out += "</h1><p class=sub>setup mode &middot; fill in and save";
+    if (macStr[0]) {
+        out += "<br>MAC ";
+        out += macStr;
+    }
+    out += "</p><form method=POST action='/save'>";
 
     for (const FormField& f : _formFields) {
         if (f.prefType == PREF_BOOL) {

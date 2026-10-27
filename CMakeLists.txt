@@ -25,6 +25,7 @@ idf_component_register(
         esp_timer
         esp_system
         lwip
+        mdns
 )
 
 target_compile_options(${COMPONENT_LIB} PUBLIC -std=gnu++17)

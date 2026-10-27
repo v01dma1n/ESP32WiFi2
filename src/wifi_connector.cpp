@@ -9,6 +9,7 @@
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_netif.h"
+#include "mdns.h"
 #include "nvs_flash.h"
 
 #include <cstring>
@@ -32,6 +33,23 @@ static void onWifiEvent(void* /*arg*/, esp_event_base_t base,
     } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP) {
         xEventGroupSetBits(s_wifiEvents, BIT_CONNECTED);
     }
+}
+
+// Advertise `host` as <host>.local. Safe to call on every connect; mDNS is
+// initialised once and the hostname is simply re-applied.
+static void startMdns(const char* host) {
+    if (!host || !*host) return;
+    static bool s_mdnsUp = false;
+    if (!s_mdnsUp) {
+        if (mdns_init() != ESP_OK) {
+            LOGINF("mDNS init failed");
+            return;
+        }
+        s_mdnsUp = true;
+    }
+    mdns_hostname_set(host);
+    mdns_instance_name_set(host);
+    LOGINF("mDNS: %s.local", host);
 }
 
 void WiFiInit() {
@@ -96,6 +114,7 @@ bool WiFiConnect(const char* host, const char* ssid, const char* pass,
 
         if (bits & BIT_CONNECTED) {
             LOGINF("WiFi connected");
+            startMdns(host);
             return true;
         }
         LOGINF("WiFi attempt failed, retrying");
